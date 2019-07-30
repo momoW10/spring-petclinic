@@ -39,7 +39,7 @@
     <div class="form-group">
       <div class="col-sm-offset-2 col-sm-10">
         <input type="hidden" name="petId" th:value="${pet.id}" />
-        <button class="btn btn-default" 
+        <button class="btn btn-default" th:with="text=${visit['new']} ? 'Add Visit' : 'Update Visit'"
          type="submit" th:text="${text}">Add Visit</button>
       </div>
     </div>

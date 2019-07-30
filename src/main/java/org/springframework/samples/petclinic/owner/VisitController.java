@@ -18,11 +18,14 @@ package org.springframework.samples.petclinic.owner;
 import org.springframework.samples.petclinic.visit.Visit;
 import org.springframework.samples.petclinic.visit.VisitRepository;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -86,18 +89,28 @@ class VisitController {
     }
 
     //add update
-    //@GetMapping("/owners/*/pets/{petId}/visits/update")
-    /*public String initUpdateVisitForm(@PathVariable("petId") int petId, Map<String, Object> model) {
-        return "pets/createOrUpdateVisitForm";
+    @GetMapping("/owners/*/pets/{petId}/visits/update")
+    public String updateVisitForm(@PathVariable("petId") int petId, Map<String, Object> model) {
+    	Collection<Visit> visit = this.visits.findByPetId(petId);
+    	model.put("visit", visit);
+        return "pets/selectUpdateVisit";
     }
     
-    @PostMapping("/owners/{ownerId}/pets/{petId}/visits/update")
-    public String processUpdateVisitForm(@Valid Visit visit, BindingResult result) {
-        if (result.hasErrors()) {
+    @GetMapping("/owners/{ownerId}/pets/{petId}/visits/update/{visitId}")
+    public String initUpdateVisitForm(@PathVariable("visitId") int id, Model model) {
+    	Visit visit = this.visits.findById(id);
+    	model.addAttribute(visit);
+    	return "pets/createOrUpdateVisitForm";
+    }
+    
+    @PostMapping("/owners/{ownerId}/pets/{petId}/visits/update/{visitId}")
+    public String processUpdateVisitForm(@Valid Visit visit, BindingResult result, @PathVariable("visitId") int visitId) {
+    	if (result.hasErrors()) {
             return "pets/createOrUpdateVisitForm";
         } else {
+            visit.setId(visitId);
             this.visits.save(visit);
             return "redirect:/owners/{ownerId}";
         }
-    }*/
+    }
 }

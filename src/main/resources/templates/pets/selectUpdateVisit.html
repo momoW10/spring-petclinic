@@ -1,0 +1,17 @@
+<html xmlns:th="https://www.thymeleaf.org"
+  th:replace="~{fragments/layout :: layout (~{::body},'owners')}">
+
+<body>
+	<h2>Select Visits</h2>
+	<table class="table table-striped">
+		<tr th:each="visit : ${visit}">
+			<td>
+			<a th:href="@{update/{visitId}(visitId=${visit.id})}"
+			th:text="${#temporals.format(visit.date, 'yyyy-MM-dd')}"></a>
+			</td>
+			<td th:text="${visit?.description}"></td>
+		</tr>
+	</table>
+</body>
+
+</html>
