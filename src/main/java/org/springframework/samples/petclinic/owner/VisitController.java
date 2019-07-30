@@ -88,27 +88,29 @@ class VisitController {
         }
     }
 
-    //add update
+    //add(select visits list)
     @GetMapping("/owners/*/pets/{petId}/visits/update")
     public String updateVisitForm(@PathVariable("petId") int petId, Map<String, Object> model) {
     	Collection<Visit> visit = this.visits.findByPetId(petId);
     	model.put("visit", visit);
         return "pets/selectUpdateVisit";
     }
-    
+    //add(updateform)
     @GetMapping("/owners/{ownerId}/pets/{petId}/visits/update/{visitId}")
     public String initUpdateVisitForm(@PathVariable("visitId") int id, Model model) {
     	Visit visit = this.visits.findById(id);
     	model.addAttribute(visit);
     	return "pets/createOrUpdateVisitForm";
     }
-    
+    //add(updateform valid and update the visit)
     @PostMapping("/owners/{ownerId}/pets/{petId}/visits/update/{visitId}")
     public String processUpdateVisitForm(@Valid Visit visit, BindingResult result, @PathVariable("visitId") int visitId) {
     	if (result.hasErrors()) {
             return "pets/createOrUpdateVisitForm";
         } else {
+        	// error!
             visit.setId(visitId);
+            
             this.visits.save(visit);
             return "redirect:/owners/{ownerId}";
         }
