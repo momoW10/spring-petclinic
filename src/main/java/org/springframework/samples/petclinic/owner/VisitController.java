@@ -63,13 +63,24 @@ class VisitController {
      * @return Pet
      */
     @ModelAttribute("visit")
-    public Visit loadPetWithVisit(@PathVariable("petId") int petId, Map<String, Object> model) {
+    public Visit loadPetWithVisit(@PathVariable("petId") int petId, /*@PathVariable("visitId") Integer visitId,*/ Map<String, Object> model) {
         Pet pet = this.pets.findById(petId);
         model.put("pet", pet);
         Visit visit = new Visit();
+//        if (visitId != null) this.visits.findById(visitId);
         pet.addVisit(visit);
         return visit;
     }
+    
+    /*@ModelAttribute("update")
+    public Visit loadVisit(@PathVariable("visitId") int visitId) {
+    	return this.visits.findById(visitId);
+    }*/
+    
+    /*@ModelAttribute("visits")
+    public Visit loadVisit(@PathVariable("visitId") int visitId, Model model) {
+    	return this.visits.findById(visitId);
+    }*/
 
     // Spring MVC calls method loadPetWithVisit(...) before initNewVisitForm is called
     @GetMapping("/owners/*/pets/{petId}/visits/new")
@@ -99,20 +110,7 @@ class VisitController {
     @GetMapping("/owners/{ownerId}/pets/{petId}/visits/update/{visitId}")
     public String initUpdateVisitForm(@PathVariable("visitId") int id, Model model) {
     	Visit visit = this.visits.findById(id);
-    	model.addAttribute(visit);
+    	model.addAttribute("visit", visit);
     	return "pets/createOrUpdateVisitForm";
     }
-    //add(updateform valid and update the visit)
-    @PostMapping("/owners/{ownerId}/pets/{petId}/visits/update/{visitId}")
-    public String processUpdateVisitForm(@Valid Visit visit, BindingResult result, @PathVariable("visitId") int visitId) {
-    	if (result.hasErrors()) {
-            return "pets/createOrUpdateVisitForm";
-        } else {
-        	// error!
-            visit.setId(visitId);
-            
-            this.visits.save(visit);
-            return "redirect:/owners/{ownerId}";
-        }
     }
-}

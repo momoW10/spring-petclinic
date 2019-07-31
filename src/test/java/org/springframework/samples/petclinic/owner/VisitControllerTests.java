@@ -16,12 +16,16 @@
 
 package org.springframework.samples.petclinic.owner;
 
+import static org.hamcrest.Matchers.hasProperty;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
+
+import java.time.LocalDate;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -32,6 +36,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.samples.petclinic.owner.Pet;
 import org.springframework.samples.petclinic.owner.PetRepository;
 import org.springframework.samples.petclinic.owner.VisitController;
+import org.springframework.samples.petclinic.visit.Visit;
 import org.springframework.samples.petclinic.visit.VisitRepository;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -46,6 +51,9 @@ import org.springframework.test.web.servlet.MockMvc;
 public class VisitControllerTests {
 
     private static final int TEST_PET_ID = 1;
+    //add visit_id
+    private static final int TEST_VISIT_ID = 1;
+    private static final int TEST_PET2_ID = 7;
 
     @Autowired
     private MockMvc mockMvc;
@@ -55,9 +63,17 @@ public class VisitControllerTests {
 
     @MockBean
     private PetRepository pets;
+    
+    private Visit visit;
 
     @Before
     public void init() {
+    	visit = new Visit();
+        visit.setId(TEST_VISIT_ID);
+        visit.setDate(LocalDate.of(2013, 01, 01));
+        visit.setDescription("rabies shot");
+        visit.setPetId(TEST_PET_ID);
+    	given(this.visits.findById(TEST_VISIT_ID)).willReturn(visit);
         given(this.pets.findById(TEST_PET_ID)).willReturn(new Pet());
     }
 
@@ -86,6 +102,34 @@ public class VisitControllerTests {
             .andExpect(model().attributeHasErrors("visit"))
             .andExpect(status().isOk())
             .andExpect(view().name("pets/createOrUpdateVisitForm"));
+    }
+    
+    //add
+    @Test
+    public void TestUpdateVisitForm() throws Exception {
+    	mockMvc.perform(get("/owners/*/pets/{petId}/visits/update", TEST_PET_ID))
+    		.andExpect(status().isOk())
+    		.andExpect(model().attributeExists("visit"));
+//    		.andExpect(model().attribute("visit"))));
+    }
+    
+    //add
+    @Test
+    public void testInitUpdateVisitForm() throws Exception {
+//        mockMvc.perform(get("/owners/*/pets/*/visits/update/{visitId}", TEST_VISIT_ID))
+//            .andExpect(status().isOk());	//bad request
+//            .andExpect(model().attributeExists("update"));
+//            .andExpect(model().attribute("visit", hasProperty("date", is("2013-01-01"))))
+//            .andExpect(model().attribute("visit", hasProperty("description", is("rabies shot"))))
+//            .andExpect(view().name("owners/createOrUpdateVisitForm"));
+    }
+    
+    @Test
+    public void testProcessUpdateVisitFormSuccess() throws Exception {
+    	mockMvc.perform(post("/owners/*/pets/*/visits/update/{visitId}", TEST_VISIT_ID)
+    			.param("date", "2013-03-03")
+    			.param("description", "aaa"))
+    		.andExpect(status().is3xxRedirection());
     }
 
 }
